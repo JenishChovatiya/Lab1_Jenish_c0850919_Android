@@ -42,7 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     Polyline line;
     Polygon shape;
-    private static final int POLYGON_SIDES = 5;
+    private static final int POLYGON_SIDES = 4;
     List<Marker> markers = new ArrayList();
 
     // location with location manager and listener
@@ -135,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             private void drawShape() {
                 PolygonOptions options = new PolygonOptions()
-                        .fillColor(0x33000000)
+                        .fillColor(0x3500FF00)
                         .strokeColor(Color.RED)
                         .strokeWidth(5);
 
