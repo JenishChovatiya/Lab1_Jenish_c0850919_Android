@@ -12,7 +12,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,6 +30,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -68,6 +72,7 @@ GoogleMap.OnMarkerDragListener
     int colorRed = 0, colorGreen = 0, colorBlue = 0;
 
 
+    TextView distanceLbl;
 
 
     SeekBar redSB;
@@ -95,6 +100,8 @@ GoogleMap.OnMarkerDragListener
         polygonSB = findViewById(R.id.polygonSeekBar);
 
 
+        //binding distance lable
+        distanceLbl = findViewById(R.id.displayDist);
 
         //adding seekbarChnaging listener
 
@@ -174,9 +181,12 @@ GoogleMap.OnMarkerDragListener
         // apply tap gesture
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapClick(@NonNull LatLng latLng) {
+            public void onMapClick(@NonNull LatLng latLng)
+            {
 
-                setMarker(latLng);
+                     setMarker(latLng);
+
+
             }
 
 
@@ -191,18 +201,21 @@ GoogleMap.OnMarkerDragListener
                            .title("A").draggable(true);
 
 
-                    float results[] = new float[10];
+
+                float results[] = new float[10];
                 Location.distanceBetween(latitude,longitude,end_latitude,end_longitude,results);
                 options.snippet("Distance = "+results[0]);
                 mMap.addMarker(options);
+
+
+                markers.add(mMap.addMarker(options));
+                if (markers.size() == POLYGON_SIDES)
+                    drawShape();
 
                 // check if there are already the same number of markers, we clear the map.
               //  if (markers.size() == POLYGON_SIDES)
                 //    clearMap();
 
-                markers.add(mMap.addMarker(options));
-                if (markers.size() == POLYGON_SIDES)
-                    drawShape();
 
 
 
@@ -246,8 +259,83 @@ GoogleMap.OnMarkerDragListener
 
 
         });
+
+        googleMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @Override
+            public void onPolylineClick(@NonNull Polyline polyline) {
+                Log.d("line clicked", polyline.getPoints().toString());
+            }
+        });
+
+
+        googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(@NonNull Polygon polygon)
+            {
+                Log.d("Add",shape.toString());
+                double count = 0;
+                for (int a = 0; a < latLngList.size();a++)
+                {
+                    if(a == latLngList.size() - 1)
+                    {
+                        count += calDistance(latLngList.get(a), latLngList.get(0));
+
+                    }
+                    else
+                    {
+                        count += calDistance(latLngList.get(a), latLngList.get(a+1));
+                    }
+                }
+                Integer totalInInt = Math.toIntExact(Math.round(count));
+              Toast.makeText(MapsActivity.this, "Total Distance is :- " + totalInInt + " km", Toast.LENGTH_SHORT).show();
+               /* if (distanceLbl.getVisibility() == TextView.INVISIBLE)
+                {
+                    distanceLbl.setVisibility(TextView.VISIBLE);
+                    distanceLbl.setText("Total Distance is :- " + totalInInt + " km");
+                } else {
+                    distanceLbl.setVisibility(TextView.INVISIBLE);
+                    distanceLbl.setText("");
+                }*/
+                distanceLbl.setText("Total Distance is :- " + totalInInt + " km");
+
+            }
+        });
+
+
+
+
+
+
+
     }
 
+
+    //implementing find distance function
+
+    double calDistance(LatLng startPoint, LatLng endPoin) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = startPoint.latitude;
+        double lat2 = endPoin.latitude;
+        double lon1 = startPoint.longitude;
+        double lon2 = endPoin.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        double km = valueResult / 1;
+        DecimalFormat newFormat = new DecimalFormat("####");
+        int kmInDec = Integer.valueOf(newFormat.format(km));
+        double meter = valueResult % 1000;
+        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        Log.i("Radius Value", "" + valueResult + "   KM  " + kmInDec
+                + " Meter   " + meterInDec);
+
+        return Radius * c;
+    }
 
     private void startUpdateLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
