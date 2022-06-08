@@ -168,25 +168,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                Boolean markerFound = false;
-                for(Marker marker1: markers)
-                {
-                    if (Math.abs(marker1.getPosition().latitude - marker.getPosition().latitude) < 0.05 && Math.abs(marker.getPosition().longitude - marker.getPosition().longitude) < 0.05)
-                    {
-                        markerFound = true;
-                    }
-                }
-                if(markerFound == false) {
-                    marker.remove();
-                }
-
-                return false;
-            }
-        });
-
         // apply tap gesture
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -205,12 +186,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     latLngList.add(latLng);
                     drawShape();
 
+
+                    Log.d("Add",shape.toString());
+                    double count = 0.0;
+                    for (int a = 0; a < latLngList.size();a++)
+                    {
+                        if(a == latLngList.size() - 1)
+                        {
+                            count += calDistance(latLngList.get(a), latLngList.get(0));
+
+                        }
+                        else
+                        {
+                            count += calDistance(latLngList.get(a), latLngList.get(a+1));
+                        }
+                    }
+                    Integer totalInInt = Math.toIntExact(Math.round(count));
+
+                    displayDist.setText("Total Distance is :- " + totalInInt + " km");
+
+
                 }
 
 
             }
 
         });
+
 
 
         googleMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
@@ -223,10 +225,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
             @Override
-            public void onPolygonClick(@NonNull Polygon polygon)
+            public void onPolygonClick(@NonNull Polygon shape)
             {
                 Log.d("Add",shape.toString());
-                double count = 0;
+                double count = 0.0;
                 for (int a = 0; a < latLngList.size();a++)
                 {
                     if(a == latLngList.size() - 1)
@@ -253,6 +255,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
 
         googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener()
         {
@@ -343,7 +346,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                 .snippet("Your Location");
         homeMarker = mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 5));
     }
 
     @Override
