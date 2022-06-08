@@ -139,7 +139,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .strokeColor(Color.RED)
                         .strokeWidth(5);
 
-                for (int i = 0; i < POLYGON_SIDES; i++) {
+                for (int i = 0; i < POLYGON_SIDES; i++)
+                {
                     options.add(markers.get(i).getPosition());
                 }
 
