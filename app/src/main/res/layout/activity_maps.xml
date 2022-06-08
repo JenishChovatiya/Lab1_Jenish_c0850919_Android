@@ -28,13 +28,6 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="Fill Polygon"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView
             android:layout_width="match_parent"
@@ -80,34 +73,7 @@
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:paddingLeft="40dp"
-            android:weightSum="2">
-
-            <Button
-                android:id="@+id/drawPolyBtn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="30dp"
-                android:layout_weight="1.5"
-                android:text="darw Polygon"
-                app:cornerRadius="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/clearBtn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="0.5"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="10dp"
-                android:text="clear"
-                app:cornerRadius="10dp"
-                app:iconTint="#E61616"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:weightSum="2"/>
 
 
     </LinearLayout>

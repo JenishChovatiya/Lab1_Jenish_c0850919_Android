@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.SeekBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,6 +36,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
 
 
+
+
     //declaring some variables
     private static final int REQUEST_CODE = 1;
     private Marker homeMarker;
@@ -44,11 +47,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Polygon shape;
     private static final int POLYGON_SIDES = 4;
     List<Marker> markers = new ArrayList();
+    List<LatLng> latLngList = new ArrayList<>();
 
     // location with location manager and listener
     LocationManager locationManager;
     LocationListener locationListener;
 
+
+
+    //declaring default values for color and seekbar
+    int colorRed = 0, colorGreen = 0, colorBlue = 0;
+
+    //SeekBar redSB,greenSB,blueSB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +71,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+      /*  //binding seekbar
+        redSB = findViewById(R.id.redSeekBar);
+        greenSB = findViewById(R.id.greenSeekBar);
+        blueSB = findViewById(R.id.blueSeekBar);
+
+
+
+        //adding seekbarChnaging listener
+
+
+        redSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
+        greenSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
+        blueSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);*/
+
+
+
     }
+
+
+
+/*
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+        switch (seekBar.getId()) {
+            case R.id.redSeekBar:
+                colorRed = i;
+                break;
+            case R.id.greenSeekBar:
+                colorGreen = i;
+                break;
+            case R.id.blueSeekBar:
+                colorBlue = i;
+                break;
+        }
+        if (shape != null)
+
+            shape.setStrokeColor(Color.rgb(colorRed, colorGreen, colorBlue));
+
+    }*/
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -70,7 +120,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
-            public void onLocationChanged(Location location) {
+            public void onLocationChanged(Location location)
+            {
                 setHomeMarker(location);
             }
 
@@ -169,6 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         });
     }
+
 
     private void startUpdateLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
