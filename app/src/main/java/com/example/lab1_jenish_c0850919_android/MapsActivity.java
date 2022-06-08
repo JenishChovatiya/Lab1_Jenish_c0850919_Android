@@ -30,7 +30,7 @@ import com.google.android.gms.maps.model.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -58,7 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //declaring default values for color and seekbar
     int colorRed = 0, colorGreen = 0, colorBlue = 0;
 
-    //SeekBar redSB,greenSB,blueSB;
+    SeekBar redSB,greenSB,blueSB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
-      /*  //binding seekbar
+       //binding seekbar
         redSB = findViewById(R.id.redSeekBar);
         greenSB = findViewById(R.id.greenSeekBar);
         blueSB = findViewById(R.id.blueSeekBar);
@@ -85,7 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         redSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
         greenSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
-        blueSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);*/
+        blueSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
 
 
 
@@ -259,4 +259,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+    {
+        switch (seekBar.getId()) {
+            case R.id.redSeekBar:
+                colorRed = progress;
+                break;
+            case R.id.greenSeekBar:
+                colorGreen = progress;
+                break;
+            case R.id.blueSeekBar:
+                colorBlue = progress;
+                break;
+        }
+        if (shape != null)
+
+            shape.setStrokeColor(Color.rgb(colorRed, colorGreen, colorBlue));
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
 }
