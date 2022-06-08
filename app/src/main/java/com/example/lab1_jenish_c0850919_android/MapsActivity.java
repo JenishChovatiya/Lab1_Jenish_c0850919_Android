@@ -29,8 +29,11 @@ import com.google.android.gms.maps.model.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener, GoogleMap.OnMarkerClickListener,
+GoogleMap.OnMarkerDragListener
+{
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -55,10 +58,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
+    //declaring variable for drag
+    double end_latitude, end_longitude;
+    double latitude, longitude;
+
+
+
     //declaring default values for color and seekbar
     int colorRed = 0, colorGreen = 0, colorBlue = 0;
 
-    SeekBar redSB,greenSB,blueSB;
+
+
+
+    SeekBar redSB;
+    SeekBar greenSB;
+    SeekBar blueSB;
+    SeekBar polygonSB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         redSB = findViewById(R.id.redSeekBar);
         greenSB = findViewById(R.id.greenSeekBar);
         blueSB = findViewById(R.id.blueSeekBar);
+        polygonSB = findViewById(R.id.polygonSeekBar);
 
 
 
@@ -86,6 +102,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         redSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
         greenSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
         blueSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
+        polygonSB.setOnSeekBarChangeListener((SeekBar.OnSeekBarChangeListener) this);
+
+
+
 
 
 
@@ -122,6 +142,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
+        mMap.setOnMarkerDragListener(this);
+        mMap.setOnMarkerClickListener(this);
+
 
         if (!hasLocationPermission())
             requestLocationPermission();
@@ -140,21 +163,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-
-
             private void setMarker(LatLng latLng)
             {
 
+
+                /*MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(new LatLng(end_latitude, end_longitude));
+                markerOptions.title("A");
+                markerOptions.draggable(true);*/
+
+
+
+
+
                     //giving title to the markers
                     MarkerOptions options = new MarkerOptions().position(latLng)
-                            .title("A");
+                           .title("A").draggable(true);
 
 
-                /*if (destMarker != null) clearMap();
-
-                destMarker = mMap.addMarker(options);
-
-                drawLine();*/
+                    float results[] = new float[10];
+                Location.distanceBetween(latitude,longitude,end_latitude,end_longitude,results);
+                options.snippet("Distance = "+results[0]);
+                mMap.addMarker(options);
 
                 // check if there are already the same number of markers, we clear the map.
                 if (markers.size() == POLYGON_SIDES)
@@ -163,6 +193,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markers.add(mMap.addMarker(options));
                 if (markers.size() == POLYGON_SIDES)
                     drawShape();
+
+
+
             }
 
 
@@ -244,6 +277,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
+
+        //for picking up random color for filing up polygon
+        final int minColorValue = 0;
+        final int maxColorValue = 255;
+        final int randomColorPicker = new Random().nextInt((maxColorValue - minColorValue) + 1) + minColorValue;
+        float[] hsvColor = {randomColorPicker, 0,randomColorPicker};
+        hsvColor[1] = 360f * progress / progress;
+
+
+
         switch (seekBar.getId()) {
             case R.id.redSeekBar:
                 colorRed = progress;
@@ -254,10 +297,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.blueSeekBar:
                 colorBlue = progress;
                 break;
+
+            case R.id.polygonSeekBar:
+                if (shape != null)
+                    shape.setFillColor(Color.HSVToColor(hsvColor));
+                break;
         }
         if (shape != null)
 
             shape.setStrokeColor(Color.rgb(colorRed, colorGreen, colorBlue));
+
+
     }
 
     @Override
@@ -267,6 +317,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker)
+    {
+        marker.setDraggable(true);
+
+        return false;
+    }
+
+    @Override
+    public void onMarkerDrag(@NonNull Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(@NonNull Marker marker)
+    {
+        end_latitude = marker.getPosition().latitude;
+        end_longitude = marker.getPosition().longitude;
+    }
+
+    @Override
+    public void onMarkerDragStart(@NonNull Marker marker) {
 
     }
 }

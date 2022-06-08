@@ -22,7 +22,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:orientation="vertical"
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:paddingLeft="150dp"
-            android:text="Polygon Color"
+            android:text="Poly Line Color"
             android:textAlignment="viewStart"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="16sp"
@@ -67,13 +67,36 @@
             android:progressTint="#0000ff"
             android:thumbTint="#0000ff" />
 
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="150dp"
+            android:text="Polygon Color"
+            android:textAlignment="viewStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+
+        <SeekBar
+            android:id="@+id/polygonSeekBar"
+            android:layout_width="380dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:max="255"
+            android:progressTint="#000000"
+            android:thumbTint="#000000" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:paddingLeft="40dp"
-            android:weightSum="2"/>
+            android:weightSum="2" />
 
 
     </LinearLayout>
