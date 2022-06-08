@@ -118,6 +118,8 @@ GoogleMap.OnMarkerDragListener
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -142,6 +144,23 @@ GoogleMap.OnMarkerDragListener
             }
         };
 
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(@NonNull LatLng latLng)
+            {
+                if (markers.size() == POLYGON_SIDES) {
+                    for (Marker marker : markers)
+                        marker.remove();
+
+                    markers.clear();
+                    shape.remove();
+                    shape = null;
+                }
+            }
+        });
+
+
+
         mMap.setOnMarkerDragListener(this);
         mMap.setOnMarkerClickListener(this);
 
@@ -152,7 +171,7 @@ GoogleMap.OnMarkerDragListener
             startUpdateLocation();
 
 
-        // apply long press gesture
+        // apply tap gesture
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(@NonNull LatLng latLng) {
@@ -167,15 +186,6 @@ GoogleMap.OnMarkerDragListener
             {
 
 
-                /*MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(new LatLng(end_latitude, end_longitude));
-                markerOptions.title("A");
-                markerOptions.draggable(true);*/
-
-
-
-
-
                     //giving title to the markers
                     MarkerOptions options = new MarkerOptions().position(latLng)
                            .title("A").draggable(true);
@@ -187,8 +197,8 @@ GoogleMap.OnMarkerDragListener
                 mMap.addMarker(options);
 
                 // check if there are already the same number of markers, we clear the map.
-                if (markers.size() == POLYGON_SIDES)
-                    clearMap();
+              //  if (markers.size() == POLYGON_SIDES)
+                //    clearMap();
 
                 markers.add(mMap.addMarker(options));
                 if (markers.size() == POLYGON_SIDES)
@@ -213,6 +223,8 @@ GoogleMap.OnMarkerDragListener
                 shape = mMap.addPolygon(options);
 
             }
+
+
 
             private void clearMap() {
 
@@ -325,7 +337,7 @@ GoogleMap.OnMarkerDragListener
     {
         marker.setDraggable(true);
 
-        return false;
+        return true;
     }
 
     @Override
