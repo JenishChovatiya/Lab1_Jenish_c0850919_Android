@@ -36,8 +36,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, SeekBar.OnSeekBarChangeListener, GoogleMap.OnMarkerClickListener,
-GoogleMap.OnMarkerDragListener
-{
+        GoogleMap.OnMarkerDragListener, GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
@@ -72,7 +71,7 @@ GoogleMap.OnMarkerDragListener
     int colorRed = 0, colorGreen = 0, colorBlue = 0;
 
 
-    TextView distanceLbl;
+    TextView displayDist;
 
 
     SeekBar redSB;
@@ -101,7 +100,7 @@ GoogleMap.OnMarkerDragListener
 
 
         //binding distance lable
-        distanceLbl = findViewById(R.id.displayDist);
+        displayDist = findViewById(R.id.displayDist);
 
         //adding seekbarChnaging listener
 
@@ -120,15 +119,17 @@ GoogleMap.OnMarkerDragListener
 
 
 
-
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull  GoogleMap googleMap)
+    {
         mMap = googleMap;
 
 
+        mMap.getUiSettings().setZoomControlsEnabled(true);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new LocationListener() {
+        locationListener = new LocationListener()
+        {
             @Override
             public void onLocationChanged(Location location)
             {
@@ -151,25 +152,13 @@ GoogleMap.OnMarkerDragListener
             }
         };
 
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(@NonNull LatLng latLng)
-            {
-                if (markers.size() == POLYGON_SIDES) {
-                    for (Marker marker : markers)
-                        marker.remove();
 
-                    markers.clear();
-                    shape.remove();
-                    shape = null;
-                }
-            }
-        });
 
 
 
         mMap.setOnMarkerDragListener(this);
         mMap.setOnMarkerClickListener(this);
+        mMap.setOnMapLongClickListener(this);
 
 
         if (!hasLocationPermission())
@@ -178,87 +167,51 @@ GoogleMap.OnMarkerDragListener
             startUpdateLocation();
 
 
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Boolean markerFound = false;
+                for(Marker marker1: markers)
+                {
+                    if (Math.abs(marker1.getPosition().latitude - marker.getPosition().latitude) < 0.05 && Math.abs(marker.getPosition().longitude - marker.getPosition().longitude) < 0.05)
+                    {
+                        markerFound = true;
+                    }
+                }
+                if(markerFound == false) {
+                    marker.remove();
+                }
+
+                return false;
+            }
+        });
+
         // apply tap gesture
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(@NonNull LatLng latLng)
             {
 
-                     setMarker(latLng);
 
-
-            }
-
-
-
-
-            private void setMarker(LatLng latLng)
-            {
-
-
-                    //giving title to the markers
-                    MarkerOptions options = new MarkerOptions().position(latLng)
-                           .title("A").draggable(true);
-
-
-
-                float results[] = new float[10];
-                Location.distanceBetween(latitude,longitude,end_latitude,end_longitude,results);
-                options.snippet("Distance = "+results[0]);
-                mMap.addMarker(options);
-
+                //giving title to the markers
+                MarkerOptions options = new MarkerOptions().position(latLng)
+                        .title("A").draggable(true);
 
                 markers.add(mMap.addMarker(options));
                 if (markers.size() == POLYGON_SIDES)
+                {
+
+                    latLngList.add(latLng);
                     drawShape();
 
-                // check if there are already the same number of markers, we clear the map.
-              //  if (markers.size() == POLYGON_SIDES)
-                //    clearMap();
-
-
-
-
-            }
-
-
-            private void drawShape() {
-                PolygonOptions options = new PolygonOptions()
-                        .fillColor(0x3500FF00)
-                        .strokeColor(Color.RED)
-                        .strokeWidth(5);
-
-                for (int i = 0; i < POLYGON_SIDES; i++)
-                {
-                    options.add(markers.get(i).getPosition());
                 }
 
-                shape = mMap.addPolygon(options);
 
             }
-
-
-
-            private void clearMap() {
-
-                /*if (destMarker != null) {
-                    destMarker.remove();
-                    destMarker = null;
-                }
-
-                line.remove();*/
-
-                for (Marker marker : markers)
-                    marker.remove();
-
-                markers.clear();
-                shape.remove();
-                shape = null;
-            }
-
-
 
         });
+
 
         googleMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
             @Override
@@ -287,26 +240,56 @@ GoogleMap.OnMarkerDragListener
                     }
                 }
                 Integer totalInInt = Math.toIntExact(Math.round(count));
-              Toast.makeText(MapsActivity.this, "Total Distance is :- " + totalInInt + " km", Toast.LENGTH_SHORT).show();
-               /* if (distanceLbl.getVisibility() == TextView.INVISIBLE)
+
+               if (displayDist.getVisibility() == TextView.INVISIBLE)
                 {
-                    distanceLbl.setVisibility(TextView.VISIBLE);
-                    distanceLbl.setText("Total Distance is :- " + totalInInt + " km");
+                    displayDist.setVisibility(TextView.VISIBLE);
+                    displayDist.setText("Total Distance is :- " + totalInInt + " km");
                 } else {
-                    distanceLbl.setVisibility(TextView.INVISIBLE);
-                    distanceLbl.setText("");
-                }*/
-                distanceLbl.setText("Total Distance is :- " + totalInInt + " km");
+                    displayDist.setVisibility(TextView.INVISIBLE);
+                    displayDist.setText("");
+                }
+
 
             }
         });
 
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener()
+        {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+
+                removeAll();
+
+                }
+
+        });
+
+    }
+
+    void drawShape()
+    {
+       PolygonOptions options = new PolygonOptions()
+                .fillColor(0x3500FF00)
+                .strokeColor(Color.RED)
+                .strokeWidth(7);
+
+        for (int i = 0; i < POLYGON_SIDES; i++)
+        {
+            options.add(markers.get(i).getPosition());
+        }
+
+        shape = mMap.addPolygon(options);
 
 
+    }
 
+    void removeAll(){
 
-
-
+        if(shape !=null) shape.remove();
+        for(Marker marker : markers) marker.remove();
+        markers.clear();
+        latLngList.clear();
     }
 
 
@@ -444,4 +427,16 @@ GoogleMap.OnMarkerDragListener
     public void onMarkerDragStart(@NonNull Marker marker) {
 
     }
+
+    @Override
+    public void onMapLongClick(@NonNull LatLng latLng) {
+        if(shape!= null)
+            {
+                shape.remove();
+                markers.clear();
+                latLngList.clear();
+
+            }
+    }
+
 }
