@@ -93,25 +93,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-/*
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-        switch (seekBar.getId()) {
-            case R.id.redSeekBar:
-                colorRed = i;
-                break;
-            case R.id.greenSeekBar:
-                colorGreen = i;
-                break;
-            case R.id.blueSeekBar:
-                colorBlue = i;
-                break;
-        }
-        if (shape != null)
-
-            shape.setStrokeColor(Color.rgb(colorRed, colorGreen, colorBlue));
-
-    }*/
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -149,16 +130,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // apply long press gesture
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
-//                Location location = new Location("Your Destination");
-//                location.setLatitude(latLng.latitude);
-//                location.setLongitude(latLng.longitude);
-                // set marker
+            public void onMapClick(@NonNull LatLng latLng) {
 
                 setMarker(latLng);
             }
+
+
+
+
+
 
             private void setMarker(LatLng latLng)
             {
